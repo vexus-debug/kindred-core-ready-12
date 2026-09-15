@@ -137,6 +137,7 @@ export default function PatientProfilePage() {
           <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
           {canViewClinical && <TabsTrigger value="notes">Clinical Notes</TabsTrigger>}
           {canViewClinical && <TabsTrigger value="images">Images</TabsTrigger>}
+          {isEyeClinic && <TabsTrigger value="eye">Eye Records</TabsTrigger>}
           <TabsTrigger value="consents">Consents</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
