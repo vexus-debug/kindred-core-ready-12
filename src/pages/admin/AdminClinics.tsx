@@ -3,11 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Search, Users, UserCheck, ExternalLink, Trash2, Settings } from "lucide-react";
+import { Building2, Search, Users, UserCheck, ExternalLink, Trash2, Settings, Pencil } from "lucide-react";
 import { useAllOrganizations, useOrgMemberCounts, useOrgPatientCounts } from "@/hooks/useAdminData";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { CreateClinicDialog } from "@/components/admin/CreateClinicDialog";
+import { EditClinicDialog } from "@/components/admin/EditClinicDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +22,7 @@ export default function AdminClinics() {
   const { data: memberCounts } = useOrgMemberCounts();
   const { data: patientCounts } = useOrgPatientCounts();
   const [search, setSearch] = useState("");
+  const [editOrg, setEditOrg] = useState<any>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -112,6 +114,15 @@ export default function AdminClinics() {
                   >
                     <ExternalLink className="h-3 w-3" /> Open
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                    onClick={() => setEditOrg(org)}
+                    aria-label={`Edit ${org.name}`}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive">
@@ -142,6 +153,12 @@ export default function AdminClinics() {
           </Card>
         ))}
       </div>
+
+      <EditClinicDialog
+        org={editOrg}
+        open={!!editOrg}
+        onOpenChange={(o) => { if (!o) setEditOrg(null); }}
+      />
     </div>
   );
 }
