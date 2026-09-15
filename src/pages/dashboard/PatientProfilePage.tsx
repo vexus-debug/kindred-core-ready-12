@@ -517,6 +517,13 @@ export default function PatientProfilePage() {
           </TabsContent>
         )}
 
+        {/* Eye Records */}
+        {isEyeClinic && (
+          <TabsContent value="eye" className="mt-4 space-y-4">
+            {patientId && <EyeRecordsTab patientId={patientId} />}
+          </TabsContent>
+        )}
+
         {/* Consent Forms */}
         <TabsContent value="consents" className="mt-4 space-y-3">
           {consentForms.length === 0 ? (
