@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -118,9 +118,9 @@ function MedicalBackground() {
 }
 
 const DEMO_CLINICS = [
-  { label: "Dental Clinic Demo", icon: Stethoscope, email: "demo@clinexus.com.ng", password: "Thepassword@48" },
-  { label: "Eye Clinic Demo", icon: Eye, email: "demo@clinexus.com.ng", password: "Thepassword@48" },
-  { label: "Diagnostic Centre Demo", icon: Microscope, email: "demo@clinexus.com.ng", password: "Thepassword@48" },
+  { label: "Dental Clinic Demo", icon: Stethoscope, slug: "demo", email: "demo@clinexus.com.ng", password: "Thepassword@48" },
+  { label: "Eye Clinic Demo", icon: Eye, slug: "eye", email: "demo@clinexus.com.ng", password: "Thepassword@48" },
+  { label: "Diagnostic Centre Demo", icon: Microscope, slug: "diagnostic-demo", email: "demo@clinexus.com.ng", password: "Thepassword@48" },
 ];
 
 export default function Login() {
@@ -128,15 +128,35 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState<string | null>(null);
+  const demoActive = useRef(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { session, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!authLoading && session) {
+    if (!authLoading && session && !demoActive.current) {
       navigate("/select-clinic", { replace: true });
     }
   }, [session, authLoading, navigate]);
+
+  const handleDemo = async (clinic: (typeof DEMO_CLINICS)[number]) => {
+    demoActive.current = true;
+    setDemoLoading(clinic.slug);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: clinic.email,
+        password: clinic.password,
+      });
+      if (error) throw error;
+      navigate(`/clinic/${clinic.slug}/dashboard`, { replace: true });
+    } catch (error: any) {
+      demoActive.current = false;
+      toast({ title: "Demo unavailable", description: error.message, variant: "destructive" });
+    } finally {
+      setDemoLoading(null);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,8 +205,8 @@ export default function Login() {
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" className="w-full">
-                  Try Demo
+                <Button type="button" variant="outline" className="w-full" disabled={!!demoLoading}>
+                  {demoLoading ? "Opening demo..." : "Try Demo"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-[var(--radix-dropdown-menu-trigger-width)] bg-popover z-50">
@@ -194,7 +214,7 @@ export default function Login() {
                 {DEMO_CLINICS.map((clinic) => (
                   <DropdownMenuItem
                     key={clinic.label}
-                    onSelect={() => { setEmail(clinic.email); setPassword(clinic.password); }}
+                    onSelect={() => handleDemo(clinic)}
                     className="gap-2"
                   >
                     <clinic.icon className="h-4 w-4 text-primary" />
@@ -204,7 +224,7 @@ export default function Login() {
               </DropdownMenuContent>
             </DropdownMenu>
             <p className="text-center text-[11px] text-muted-foreground -mt-2">
-              Pick a demo clinic, sign in, then select it from your clinic list.
+              Pick a demo clinic to explore it instantly.
             </p>
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
