@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { EyeRecordsTab } from "@/components/dashboard/eye/EyeRecordsTab";
 
 const statusStyles: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
