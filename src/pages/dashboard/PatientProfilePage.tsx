@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { EyeRecordsTab } from "@/components/dashboard/eye/EyeRecordsTab";
 
 const statusStyles: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
@@ -64,6 +65,7 @@ export default function PatientProfilePage() {
 
   const canViewClinical = roles.some(r => ["admin", "dentist", "hygienist"].includes(r)) || ["owner", "admin", "dentist", "hygienist"].includes(orgRole);
   const canEditClinical = roles.some(r => ["admin", "dentist", "hygienist"].includes(r)) || ["owner", "admin", "dentist", "hygienist"].includes(orgRole);
+  const isEyeClinic = currentOrg?.clinic_type === "eye";
 
   const { data: patient, isLoading } = usePatientDetail(patientId);
   const { data: visits = [] } = usePatientVisits(patientId);
@@ -136,6 +138,7 @@ export default function PatientProfilePage() {
           <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
           {canViewClinical && <TabsTrigger value="notes">Clinical Notes</TabsTrigger>}
           {canViewClinical && <TabsTrigger value="images">Images</TabsTrigger>}
+          {isEyeClinic && <TabsTrigger value="eye">Eye Records</TabsTrigger>}
           <TabsTrigger value="consents">Consents</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
@@ -511,6 +514,13 @@ export default function PatientProfilePage() {
                 ))}
               </div>
             )}
+          </TabsContent>
+        )}
+
+        {/* Eye Records */}
+        {isEyeClinic && (
+          <TabsContent value="eye" className="mt-4 space-y-4">
+            {patientId && <EyeRecordsTab patientId={patientId} />}
           </TabsContent>
         )}
 
