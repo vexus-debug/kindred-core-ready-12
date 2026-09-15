@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Stethoscope, Microscope } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import clinexusLogo from "@/assets/clinexus-logo-rect.png";
 
@@ -116,6 +117,12 @@ function MedicalBackground() {
   );
 }
 
+const DEMO_CLINICS = [
+  { label: "Dental Clinic Demo", icon: Stethoscope, email: "demo@clinexus.com.ng", password: "Thepassword@48" },
+  { label: "Eye Clinic Demo", icon: Eye, email: "demo@clinexus.com.ng", password: "Thepassword@48" },
+  { label: "Diagnostic Centre Demo", icon: Microscope, email: "demo@clinexus.com.ng", password: "Thepassword@48" },
+];
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -176,14 +183,29 @@ export default function Login() {
             <Button type="submit" className="w-full font-semibold shadow-lg shadow-primary/20" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => { setEmail("demo@clinexus.com.ng"); setPassword("Thepassword@48"); }}
-            >
-              Try Demo
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline" className="w-full">
+                  Try Demo
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-[var(--radix-dropdown-menu-trigger-width)] bg-popover z-50">
+                <DropdownMenuLabel className="text-xs text-muted-foreground">Choose a demo clinic</DropdownMenuLabel>
+                {DEMO_CLINICS.map((clinic) => (
+                  <DropdownMenuItem
+                    key={clinic.label}
+                    onSelect={() => { setEmail(clinic.email); setPassword(clinic.password); }}
+                    className="gap-2"
+                  >
+                    <clinic.icon className="h-4 w-4 text-primary" />
+                    {clinic.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <p className="text-center text-[11px] text-muted-foreground -mt-2">
+              Pick a demo clinic, sign in, then select it from your clinic list.
+            </p>
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link to="/signup" className="font-medium text-primary hover:underline">
